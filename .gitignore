@@ -1,0 +1,13 @@
+/target
+**/*.rs.bk
+.env
+Cargo.lock
+.idea/
+.vscode/
+*.pdb
+*.exe
+*.dll
+*.so
+*.dylib
+.DS_Store
+postgres_data/

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: rust-db-api
+    env: docker
+    buildCommand: docker build -t rust-db-api .
+    startCommand: docker run -p $PORT:8080 rust-db-api
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rust-api-db
+          property: connectionString
+      - key: RUST_LOG
+        value: debug
+      - key: HOST
+        value: 0.0.0.0
+
+databases:
+  - name: rust-api-db
+    databaseName: rust_api_db
+    plan: free
