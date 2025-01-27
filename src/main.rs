@@ -2,12 +2,39 @@ mod models;
 mod db;
 mod handlers;
 
+use actix_cors::Cors;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
-// Basic health check endpoint
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        handlers::health_check,
+        handlers::create_item,
+        handlers::get_item,
+        handlers::list_items
+    ),
+    components(
+        schemas(models::Item, models::CreateItem)
+    ),
+    tags(
+        (name = "rust-db-api", description = "Rust Database API endpoints")
+    )
+)]
+struct ApiDoc;
+
+/// Health check endpoint
+#[utoipa::path(
+    get,
+    path = "/health",
+    responses(
+        (status = 200, description = "API is healthy", body = String)
+    )
+)]
 async fn health_check() -> impl Responder {
     HttpResponse::Ok().json(serde_json::json!({
         "status": "healthy",
@@ -37,11 +64,24 @@ async fn main() -> std::io::Result<()> {
         .expect("PORT must be a number");
 
     println!("Starting server at http://{}:{}", host, port);
+    println!("API documentation available at http://{}:{}/docs", host, port);
 
     // Start HTTP server
     HttpServer::new(move || {
+        // Configure CORS
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allow_any_method()
+            .allow_any_header()
+            .max_age(3600);
+
         App::new()
+            .wrap(cors)
             .app_data(web::Data::new(pool.clone()))
+            .service(
+                SwaggerUi::new("/docs/{_:.*}")
+                    .url("/api-docs/openapi.json", ApiDoc::openapi()),
+            )
             .route("/health", web::get().to(health_check))
             .route("/items", web::post().to(handlers::create_item))
             .route("/items", web::get().to(handlers::list_items))

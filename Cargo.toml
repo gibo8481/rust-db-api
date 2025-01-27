@@ -14,3 +14,6 @@ env_logger = "0.10"
 log = "0.4"
 thiserror = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
+actix-cors = "0.6"
+utoipa = { version = "4.1", features = ["actix_extras"] }
+utoipa-swagger-ui = { version = "5.0", features = ["actix-web"] }
