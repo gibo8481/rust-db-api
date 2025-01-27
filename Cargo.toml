@@ -17,3 +17,10 @@ chrono = { version = "0.4", features = ["serde"] }
 actix-cors = "0.6"
 utoipa = { version = "4.1", features = ["actix_extras"] }
 utoipa-swagger-ui = { version = "5.0", features = ["actix-web"] }
+
+[dev-dependencies]
+actix-rt = "2.9"
+actix-test = "0.1"
+serial_test = "2.0"
+uuid = { version = "1.6", features = ["v4"] }
+fake = { version = "2.9", features = ["derive"] }
